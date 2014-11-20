@@ -69,15 +69,7 @@ public class WordCountTopology {
         count = 0;
       count++;
       counts.put(word, count);
-      OutputStream o;
-        try {
-            o = new FileOutputStream("~/output.txt", true);
-            o.write(word.getBytes());
-            o.close();
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+
 
       collector.emit(new Values(word, count));
 	

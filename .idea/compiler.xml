@@ -23,10 +23,12 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="storm-starter" />
+        <module name="twitter-storm" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
       <module name="storm-starter" target="1.6" />
+      <module name="twitter-storm" target="1.6" />
     </bytecodeTargetLevel>
   </component>
 </project>
