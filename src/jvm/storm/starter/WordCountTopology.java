@@ -70,7 +70,6 @@ public class WordCountTopology {
       count++;
       counts.put(word, count);
 
-
       collector.emit(new Values(word, count));
 	
     }
