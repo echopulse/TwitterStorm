@@ -46,10 +46,10 @@ public class TwitterSampleSpout extends BaseRichSpout {
 	SpoutOutputCollector _collector;
 	LinkedBlockingQueue<Status> queue = null;
 	TwitterStream _twitterStream;
-	String consumerKey;
-	String consumerSecret;
-	String accessToken;
-	String accessTokenSecret;
+	String consumerKey = "YmRtCKA3Wr7AuVpUDtjGJqb93";
+	String consumerSecret = "JehrDh4xX1xNA4mjVIwENJ21j37w63QVHYTyOF59D1Ov7S0IZG";
+	String accessToken = "2895960459-jsgATLhhquLhmcjWzsEfc9XDQ2emwnBGuCSZhHK";
+	String accessTokenSecret = "XB6QDf6WpOgTe52stgiOqaGZbcKHMEZgUbmxroPqPpF6Z";
 	String[] keyWords;
 
 	public TwitterSampleSpout(String consumerKey, String consumerSecret,
@@ -75,7 +75,7 @@ public class TwitterSampleSpout extends BaseRichSpout {
 
 			@Override
 			public void onStatus(Status status) {
-			
+
 				queue.offer(status);
 			}
 
@@ -112,16 +112,8 @@ public class TwitterSampleSpout extends BaseRichSpout {
 		AccessToken token = new AccessToken(accessToken, accessTokenSecret);
 		twitterStream.setOAuthAccessToken(token);
 		
-		if (keyWords.length == 0) {
+		twitterStream.sample();
 
-			twitterStream.sample();
-		}
-
-		else {
-
-			FilterQuery query = new FilterQuery().track(keyWords);
-			twitterStream.filter(query);
-		}
 
 	}
 
@@ -131,7 +123,7 @@ public class TwitterSampleSpout extends BaseRichSpout {
 		if (ret == null) {
 			Utils.sleep(50);
 		} else {
-			_collector.emit(new Values(ret));
+			_collector.emit(new Values(ret.getText()));
 
 		}
 	}
