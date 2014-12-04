@@ -39,9 +39,9 @@ public class TwitterTest {
 
         TopologyBuilder builder = new TopologyBuilder();
 
-        builder.setSpout("spout", new TwitterSampleSpout(), 5);
-
-        builder.setBolt("count", new PrinterTweetBolt(), 12).shuffleGrouping("spout");
+        builder.setSpout("spout", new TwitterSampleSpout(), 3);
+        builder.setBolt("split", new SplitBolt(), 3).shuffleGrouping("spout");
+        builder.setBolt("count", new PrinterTweetBolt(), 3).shuffleGrouping("split");
 
         Config conf = new Config();
         conf.setDebug(true);
@@ -59,10 +59,23 @@ public class TwitterTest {
 
             LocalCluster cluster = new LocalCluster();
             cluster.submitTopology("word-count", conf, topology);
-            Thread.sleep(5000);
+
+            builder.createTopology();
+
+            try {
+                Thread.sleep(20000);
+            } catch (InterruptedException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+            cluster.shutdown();
+
             //cluster.killTopology("word-count");
 
             cluster.shutdown();
+
+
+
         }
     }
 }

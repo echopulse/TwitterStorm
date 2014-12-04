@@ -18,6 +18,7 @@
 
 package storm.starter.spout;
 
+import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -52,8 +53,9 @@ public class TwitterSampleSpout extends BaseRichSpout {
 	String accessTokenSecret = "XB6QDf6WpOgTe52stgiOqaGZbcKHMEZgUbmxroPqPpF6Z";
 	String[] keyWords;
 
+
 	public TwitterSampleSpout(String consumerKey, String consumerSecret,
-			String accessToken, String accessTokenSecret, String[] keyWords) {
+							  String accessToken, String accessTokenSecret, String[] keyWords) {
 		this.consumerKey = consumerKey;
 		this.consumerSecret = consumerSecret;
 		this.accessToken = accessToken;
@@ -67,7 +69,7 @@ public class TwitterSampleSpout extends BaseRichSpout {
 
 	@Override
 	public void open(Map conf, TopologyContext context,
-			SpoutOutputCollector collector) {
+					 SpoutOutputCollector collector) {
 		queue = new LinkedBlockingQueue<Status>(1000);
 		_collector = collector;
 
@@ -111,7 +113,7 @@ public class TwitterSampleSpout extends BaseRichSpout {
 		twitterStream.setOAuthConsumer(consumerKey, consumerSecret);
 		AccessToken token = new AccessToken(accessToken, accessTokenSecret);
 		twitterStream.setOAuthAccessToken(token);
-		
+
 		twitterStream.sample();
 
 
@@ -123,7 +125,13 @@ public class TwitterSampleSpout extends BaseRichSpout {
 		if (ret == null) {
 			Utils.sleep(50);
 		} else {
-			_collector.emit(new Values(ret.getText()));
+			Map data = new HashMap();
+			data.put("username", ret.getUser().getName());
+			data.put("text",ret.getText());
+			data.put("timestamp", ret.getCreatedAt());
+			data.put("retweetCount", ret.getRetweetCount());
+
+			_collector.emit(new Values(data));
 
 		}
 	}
@@ -150,7 +158,7 @@ public class TwitterSampleSpout extends BaseRichSpout {
 
 	@Override
 	public void declareOutputFields(OutputFieldsDeclarer declarer) {
-		declarer.declare(new Fields("tweet"));
+		declarer.declare(new Fields("data"));
 	}
 
 }
