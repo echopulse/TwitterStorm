@@ -61,8 +61,12 @@ public class SplitBolt implements IRichBolt{
         System.out.println("HHHHHHH:" + username);
 
         _collector.emit("user", new Values(username, timestamp));
-        _collector.emit("hashtag", new Values(hashtags, timestamp));
-        _collector.emit("mention", new Values(mentions, timestamp));
+
+        for (String hashtag : hashtags)
+            _collector.emit("hashtag", new Values(hashtag, timestamp));
+
+        for (String mention : mentions)
+            _collector.emit("mention", new Values(mention, timestamp));
     }
 
     @Override
