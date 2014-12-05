@@ -2,6 +2,7 @@ package storm.starter;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
+import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.IRichBolt;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
@@ -22,7 +23,7 @@ public class SplitBolt implements IRichBolt{
 
     @Override
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
-
+        _collector = outputCollector;
     }
 
     @Override
@@ -59,7 +60,7 @@ public class SplitBolt implements IRichBolt{
 
         System.out.println("HHHHHHH:" + username);
 
-        _collector.emit(new Values(username));
+        _collector.emit(new Values(username, " ", " "));
     }
 
     @Override
