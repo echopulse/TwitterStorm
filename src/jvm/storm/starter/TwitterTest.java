@@ -44,14 +44,24 @@ public class TwitterTest {
 
         builder.setSpout("spout", new TwitterSampleSpout(), 1);
         builder.setBolt("split", new SplitBolt(), 3).shuffleGrouping("spout");
-        //Unmodified
-        builder.setBolt("hashtag-counter", new RollingCountBolt(9, 3), 3).fieldsGrouping("split", "hashtag", new Fields("hashtags"));
-        //Unmodified
+        
+        //Hashtags
+        builder.setBolt("hashtag-counter", new RollingCountBolt(9, 3), 3).fieldsGrouping("split", "hashtags", new Fields("hashtag"));
         builder.setBolt("hashtag-intermediate-ranking", new IntermediateRankingsBolt(10), 3).fieldsGrouping("hashtag-counter", new Fields("obj"));
-        //Unmodified
         builder.setBolt("hashtag-total-ranking", new TotalRankingsBolt(10)).globalGrouping("hashtag-intermediate-ranking");
-
         builder.setBolt("hashtag-ranking-print", new RankingPrinterBolt("HASHTAG_RANKING.txt")).shuffleGrouping("hashtag-total-ranking");
+
+        //Most active user
+        builder.setBolt("user-counter", new RollingCountBolt(9, 3), 3).fieldsGrouping("split", "usernames", new Fields("username"));
+        builder.setBolt("user-intermediate-ranking", new IntermediateRankingsBolt(10), 3).fieldsGrouping("user-counter", new Fields("obj"));
+        builder.setBolt("user-total-ranking", new TotalRankingsBolt(10)).globalGrouping("user-intermediate-ranking");
+        builder.setBolt("user-ranking-print", new RankingPrinterBolt("USER_RANKING.txt")).shuffleGrouping("user-total-ranking");
+
+        //Mentions
+        builder.setBolt("mentions-counter", new RollingCountBolt(9, 3), 3).fieldsGrouping("split", "mentions", new Fields("mention"));
+        builder.setBolt("mentions-intermediate-ranking", new IntermediateRankingsBolt(10), 3).fieldsGrouping("mentions-counter", new Fields("obj"));
+        builder.setBolt("mentions-total-ranking", new TotalRankingsBolt(10)).globalGrouping("mentions-intermediate-ranking");
+        builder.setBolt("mentions-ranking-print", new RankingPrinterBolt("MENTIONS_RANKING.txt")).shuffleGrouping("mentions-total-ranking");
 
 
         Config conf = new Config();

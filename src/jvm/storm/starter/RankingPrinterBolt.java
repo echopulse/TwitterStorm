@@ -11,6 +11,9 @@ import storm.starter.tools.Rankings;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +26,7 @@ public class RankingPrinterBolt extends BaseRichBolt {
     int count = 0;
     private OutputCollector _collector;
     private String filename;
+    private DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
 
     public RankingPrinterBolt(String filename) {
         this.filename = filename;
@@ -42,16 +46,26 @@ public class RankingPrinterBolt extends BaseRichBolt {
 
     @Override
     public void execute(Tuple tuple) {
+
+        Date date = new Date();
         Object temp = tuple.getValue(0);
         Rankings ranks = (Rankings) tuple.getValue(0);
-        writer.println("Rankings - ");
-        List<Rankable> list;
-        list = ranks.getRankings();
-        for (Rankable r : list)
-            writer.println((String)r.getObject() + " : " + r.getCount());
-        writer.flush();
+
+        if(ranks.size() != 0) {
+
+            writer.println("----------- Rankings: " + (dateFormat.format(date)) + "-----------");
+            List<Rankable> list;
+            list = ranks.getRankings();
+            for (Rankable r : list)
+                writer.println((String) r.getObject() + " : " + r.getCount());
+
+            writer.println();
+            writer.flush();
+        }
+
         // Confirm that this tuple has been treated.
         _collector.ack(tuple);
+
     }
 
     @Override

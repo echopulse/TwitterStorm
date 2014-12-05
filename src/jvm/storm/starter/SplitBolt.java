@@ -41,21 +41,21 @@ public class SplitBolt implements IRichBolt{
         //long retweetCount = (long) data.get("retweetCount");
 
 
-        String[] words = str.split("\\s+");
+        String[] words = str.trim().split("\\s+");
 
         for(String word : words)
         {
             if(word.startsWith("#")){
-                String hashtag = word.substring(1, word.length());
-                _collector.emit("hashtag", new Values(hashtag, timestamp));
+                String hashtag = word.substring(1, word.length()).toUpperCase();
+                _collector.emit("hashtags", new Values(hashtag, timestamp));
             }
             if(word.startsWith("@")){
                 String mention = word.substring(1, word.length());
-                _collector.emit("mention", new Values(mention, timestamp));
+                _collector.emit("mentions", new Values(mention, timestamp));
             }
         }
 
-        _collector.emit("user", new Values(username, timestamp));
+        _collector.emit("users", new Values(username, timestamp));
     }
 
     @Override
@@ -66,9 +66,9 @@ public class SplitBolt implements IRichBolt{
     @Override
     //OUTPUT
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declareStream("user", new Fields("username", "timestamp"));
-        declarer.declareStream("hashtag", new Fields("hashtags", "timestamp"));
-        declarer.declareStream("mention", new Fields("mention", "timestamp"));
+        declarer.declareStream("usernames", new Fields("username", "timestamp"));
+        declarer.declareStream("hashtags", new Fields("hashtag", "timestamp"));
+        declarer.declareStream("mentions", new Fields("mention", "timestamp"));
 
     }
 
