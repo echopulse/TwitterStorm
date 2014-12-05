@@ -60,7 +60,9 @@ public class SplitBolt implements IRichBolt{
 
         System.out.println("HHHHHHH:" + username);
 
-        _collector.emit(new Values(username, " ", " "));
+        _collector.emit("user", new Values(username, timestamp));
+        _collector.emit("hashtag", new Values(hashtags, timestamp));
+        _collector.emit("mention", new Values(mentions, timestamp));
     }
 
     @Override
@@ -71,8 +73,9 @@ public class SplitBolt implements IRichBolt{
     @Override
     //OUTPUT
     public void declareOutputFields(OutputFieldsDeclarer declarer) {
-        declarer.declare(new Fields("username", "hashtags", "timestamp"));
-
+        declarer.declareStream("user", new Fields("username", "timestamp"));
+        declarer.declareStream("hashtag", new Fields("hashtags", "timestamp"));
+        declarer.declareStream("mention", new Fields("mention", "timestamp"));
 
     }
 

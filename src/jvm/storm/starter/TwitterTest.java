@@ -39,9 +39,9 @@ public class TwitterTest {
 
         TopologyBuilder builder = new TopologyBuilder();
 
-        builder.setSpout("spout", new TwitterSampleSpout(), 3);
+        builder.setSpout("spout", new TwitterSampleSpout(), 1);
         builder.setBolt("split", new SplitBolt(), 3).shuffleGrouping("spout");
-        builder.setBolt("count", new PrinterTweetBolt(), 3).shuffleGrouping("split");
+        builder.setBolt("count", new PrinterTweetBolt(), 3).shuffleGrouping("split", "user");
 
         Config conf = new Config();
         conf.setDebug(true);
