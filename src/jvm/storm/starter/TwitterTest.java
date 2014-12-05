@@ -11,6 +11,9 @@ import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
+import storm.starter.bolt.IntermediateRankingsBolt;
+import storm.starter.bolt.RollingCountBolt;
+import storm.starter.bolt.TotalRankingsBolt;
 import storm.starter.spout.RandomSentenceSpout;
 import storm.starter.spout.TwitterSampleSpout;
 
@@ -41,7 +44,15 @@ public class TwitterTest {
 
         builder.setSpout("spout", new TwitterSampleSpout(), 1);
         builder.setBolt("split", new SplitBolt(), 3).shuffleGrouping("spout");
-        builder.setBolt("count", new PrinterTweetBolt(), 3).shuffleGrouping("split", "user");
+        //Unmodified
+        builder.setBolt("hashtag-counter", new RollingCountBolt(9, 3), 3).fieldsGrouping("split", "hashtag", new Fields("hashtags"));
+        //Unmodified
+        builder.setBolt("hashtag-intermediate-ranking", new IntermediateRankingsBolt(100), 3).fieldsGrouping("hashtag-counter", new Fields("obj"));
+        //Unmodified
+        builder.setBolt("hashtag-total-ranking", new TotalRankingsBolt(100)).globalGrouping("hashtag-intermediate-ranking");
+
+        builder.setBolt("hashtag-ranking-print", new FileWriterBolt("HASHTAG_RANKING.txt")).shuffleGrouping("hashtag-total-ranking");
+
 
         Config conf = new Config();
         conf.setDebug(true);

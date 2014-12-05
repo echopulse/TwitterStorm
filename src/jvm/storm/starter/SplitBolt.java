@@ -43,30 +43,19 @@ public class SplitBolt implements IRichBolt{
 
         String[] words = str.split("//t");
 
-        ArrayList<String> hashtags = new ArrayList<String>();
-        ArrayList<String> mentions = new ArrayList<String>();
-
         for(String word : words)
         {
             if(word.startsWith("#")){
-                hashtags.add(word.substring(1, word.length()));
+                String hashtag = word.substring(1, word.length());
+                _collector.emit("hashtag", new Values(hashtag, timestamp));
             }
             if(word.startsWith("@")){
-                mentions.add(word.substring(1, word.length()));
+                String mention = word.substring(1, word.length());
+                _collector.emit("mention", new Values(mention, timestamp));
             }
-
-
         }
 
-        System.out.println("HHHHHHH:" + username);
-
         _collector.emit("user", new Values(username, timestamp));
-
-        for (String hashtag : hashtags)
-            _collector.emit("hashtag", new Values(hashtag, timestamp));
-
-        for (String mention : mentions)
-            _collector.emit("mention", new Values(mention, timestamp));
     }
 
     @Override
