@@ -126,6 +126,7 @@ public class TwitterSampleSpout extends BaseRichSpout {
 			Utils.sleep(50);
 		} else {
 			Map data = new HashMap();
+			ret.getUser().getLang();
 			data.put("username", ret.getUser().getName());
 			data.put("text",ret.getText());
 			data.put("timestamp", ret.getCreatedAt());

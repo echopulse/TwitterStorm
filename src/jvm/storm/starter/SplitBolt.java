@@ -41,7 +41,7 @@ public class SplitBolt implements IRichBolt{
         //long retweetCount = (long) data.get("retweetCount");
 
 
-        String[] words = str.split("//t");
+        String[] words = str.split("\\s+");
 
         for(String word : words)
         {

@@ -47,11 +47,11 @@ public class TwitterTest {
         //Unmodified
         builder.setBolt("hashtag-counter", new RollingCountBolt(9, 3), 3).fieldsGrouping("split", "hashtag", new Fields("hashtags"));
         //Unmodified
-        builder.setBolt("hashtag-intermediate-ranking", new IntermediateRankingsBolt(100), 3).fieldsGrouping("hashtag-counter", new Fields("obj"));
+        builder.setBolt("hashtag-intermediate-ranking", new IntermediateRankingsBolt(10), 3).fieldsGrouping("hashtag-counter", new Fields("obj"));
         //Unmodified
-        builder.setBolt("hashtag-total-ranking", new TotalRankingsBolt(100)).globalGrouping("hashtag-intermediate-ranking");
+        builder.setBolt("hashtag-total-ranking", new TotalRankingsBolt(10)).globalGrouping("hashtag-intermediate-ranking");
 
-        builder.setBolt("hashtag-ranking-print", new FileWriterBolt("HASHTAG_RANKING.txt")).shuffleGrouping("hashtag-total-ranking");
+        builder.setBolt("hashtag-ranking-print", new RankingPrinterBolt("HASHTAG_RANKING.txt")).shuffleGrouping("hashtag-total-ranking");
 
 
         Config conf = new Config();
