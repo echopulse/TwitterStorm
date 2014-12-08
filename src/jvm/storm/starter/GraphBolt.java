@@ -60,6 +60,8 @@ public class GraphBolt implements IRichBolt {
             }
         }
 
+        //fdsafasfasf
+
 
         /*if(!edgeExist(username, mention) && !edgeExist(mention, username)) {
             graph.addEdge(username + " " + mention, username, mention);
