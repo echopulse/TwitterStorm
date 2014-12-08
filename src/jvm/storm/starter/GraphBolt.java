@@ -22,26 +22,49 @@ public class GraphBolt implements IRichBolt {
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         _collector = outputCollector;
         graph = new SingleGraph("graph");
-        graph.display();
+
     }
 
     @Override
     public void execute(Tuple tuple) {
 
-        String username = (String) tuple.getValue(0);
-        String mention = (String) tuple.getValue(1);
+        String username = tuple.getString(0);
+        String mention = tuple.getString(1);
 
-        if(!nodeExist(username)) {
-            graph.addNode(username);
+        Node a;
+        Node b;
+
+        if(!username.equals(mention))
+        {
+            if(!nodeExist(username)) {
+                a = graph.addNode(username);
+                a.addAttribute("ui.label", username);
+            }
+            else
+            {
+                a = graph.getNode(username);
+            }
+
+            if(!nodeExist(mention)) {
+                b = graph.addNode(mention);
+                b.addAttribute("ui.label", mention);
+            }
+            else
+            {
+                b = graph.getNode(mention);
+            }
+
+            if(!a.hasEdgeBetween(b) && !b.hasEdgeBetween(a))
+            {
+                graph.addEdge(username + " " + mention, a, b);
+            }
         }
 
-        if(!nodeExist(mention)) {
-            graph.addNode(mention);
-        }
 
-        if(!edgeExist(username, mention)) {
+        /*if(!edgeExist(username, mention) && !edgeExist(mention, username)) {
             graph.addEdge(username + " " + mention, username, mention);
-        }
+        }*/
+
     }
 
     public boolean edgeExist(String a, String b) {
@@ -64,6 +87,14 @@ public class GraphBolt implements IRichBolt {
 
     @Override
     public void cleanup() {
+        for(Node n : graph)
+        {
+            if(n.getDegree() < 5)
+            {
+                graph.removeNode(n);
+            }
+        }
+        graph.display();
 
     }
 
