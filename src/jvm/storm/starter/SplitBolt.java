@@ -38,7 +38,7 @@ public class SplitBolt implements IRichBolt{
         String str = (String) data.get("text");
         String username = (String) data.get("username");
         Date timestamp = (Date) data.get("timestamp");
-        //long retweetCount = (long) data.get("retweetCount");
+        int retweetCount = (Integer) data.get("retweetCount");
 
 
         String[] words = str.trim().split("\\s+");
