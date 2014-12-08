@@ -108,7 +108,7 @@ public class TwitterSampleSpout extends BaseRichSpout {
 		TwitterStream twitterStream = new TwitterStreamFactory(
 				new ConfigurationBuilder().setJSONStoreEnabled(true).build())
 				.getInstance();
-
+		_twitterStream = twitterStream;
 		twitterStream.addListener(listener);
 		twitterStream.setOAuthConsumer(consumerKey, consumerSecret);
 		AccessToken token = new AccessToken(accessToken, accessTokenSecret);
