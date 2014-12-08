@@ -10,16 +10,10 @@ import backtype.storm.topology.TopologyBuilder;
 import backtype.storm.topology.base.BaseBasicBolt;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
-import backtype.storm.tuple.Values;
 import storm.starter.bolt.IntermediateRankingsBolt;
 import storm.starter.bolt.RollingCountBolt;
 import storm.starter.bolt.TotalRankingsBolt;
-import storm.starter.spout.RandomSentenceSpout;
 import storm.starter.spout.TwitterSampleSpout;
-import storm.starter.util.GraphBolt;
-
-import java.util.HashMap;
-import java.util.Map;
 
 // Created by gperinazzo on 28/11/2014
 
