@@ -1,4 +1,4 @@
-package storm.starter.util;
+package storm.starter;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
