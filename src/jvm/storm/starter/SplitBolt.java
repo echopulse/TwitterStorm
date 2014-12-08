@@ -14,10 +14,9 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * Created by umarq on 04/12/2014.
- */
-public class SplitBolt implements IRichBolt{
+// Created by umarq on 04/12/2014
+
+public class SplitBolt implements IRichBolt {
 
     private OutputCollector _collector;
 
@@ -31,27 +30,28 @@ public class SplitBolt implements IRichBolt{
         Object temp = tuple.getValue(0);
         Map data = (Map) temp;
 
-        //Example Tweets
-        //[RT @toppcrab: sparkling masterpiece @ToppDoggHouse #ToppKlass1stAnnie http://t.co/nj3qQzFFXr]
-        //[GAK ADA UANG BISA DP BRO JAKET FAVORIT ANDA @wildan_kk CP. 089693622357/PIN. 2636AE00 http://t.co/3hVWvuLAO2]
+        // Example Tweet
+        // [RT @toppcrab: sparkling masterpiece @ToppDoggHouse #ToppKlass1stAnnie http://t.co/nj3qQzFFXr]
+        // [GAK ADA UANG BISA DP BRO JAKET FAVORIT ANDA @wildan_kk CP. 089693622357/PIN. 2636AE00 http://t.co/3hVWvuLAO2]
 
         String str = (String) data.get("text");
         String username = (String) data.get("username");
         Date timestamp = (Date) data.get("timestamp");
-        int retweetCount = (Integer) data.get("retweetCount");
-
+        long retweetCount = (Long) data.get("retweetCount");
 
         String[] words = str.trim().split("\\s+");
 
-        for(String word : words)
-        {
-            if(word.startsWith("#")){
+        for (String word : words) {
+
+            if (word.startsWith("#")) {
                 String hashtag = word.substring(1, word.length()).toUpperCase();
                 _collector.emit("hashtags", new Values(hashtag, timestamp));
             }
-            if(word.startsWith("@")){
+
+            if (word.startsWith("@")) {
                 String mention = word.substring(1, word.length());
                 _collector.emit("mentions", new Values(mention, timestamp));
+                _collector.emit("links", new Values(username, mention));
             }
         }
 
@@ -69,7 +69,7 @@ public class SplitBolt implements IRichBolt{
         declarer.declareStream("usernames", new Fields("username", "timestamp"));
         declarer.declareStream("hashtags", new Fields("hashtag", "timestamp"));
         declarer.declareStream("mentions", new Fields("mention", "timestamp"));
-
+        declarer.declareStream("links", new Fields("username", "mention"));
     }
 
     @Override
