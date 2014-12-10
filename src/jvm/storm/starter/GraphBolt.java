@@ -6,6 +6,7 @@ import backtype.storm.topology.IRichBolt;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Tuple;
 
+import java.util.Iterator;
 import java.util.Map;
 
 import org.graphstream.graph.*;
@@ -22,7 +23,7 @@ public class GraphBolt implements IRichBolt {
     public void prepare(Map map, TopologyContext topologyContext, OutputCollector outputCollector) {
         _collector = outputCollector;
         graph = new SingleGraph("graph");
-
+        graph.display();
     }
 
     @Override
@@ -60,23 +61,24 @@ public class GraphBolt implements IRichBolt {
             }
         }
 
-        //fdsafasfasf
-
-
-        /*if(!edgeExist(username, mention) && !edgeExist(mention, username)) {
+        /*
+        if(!edgeExist(username, mention) && !edgeExist(mention, username)) {
             graph.addEdge(username + " " + mention, username, mention);
-        }*/
-
+        }
+        */
     }
 
+    /*
     public boolean edgeExist(String a, String b) {
         for (Edge e : graph.getEachEdge()) {
+
             if (e.getId().equals(a + " " + b)) {
                 return true;
             }
         }
         return false;
     }
+    */
 
     public boolean nodeExist(String s) {
         for (Node n : graph.getEachNode()) {
@@ -89,15 +91,14 @@ public class GraphBolt implements IRichBolt {
 
     @Override
     public void cleanup() {
-        for(Node n : graph)
-        {
-            if(n.getDegree() < 5)
-            {
+        for (Node n : graph.getEachNode()) {
+            Iterator<? extends Node> i = n.getBreadthFirstIterator();
+            Node next = i.next();
+            if (n.getDegree() == 1 && next.getDegree() == 1) {
                 graph.removeNode(n);
+                graph.removeNode(next);
             }
         }
-        graph.display();
-
     }
 
     @Override
