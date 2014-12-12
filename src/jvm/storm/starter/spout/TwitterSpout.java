@@ -42,7 +42,7 @@ import backtype.storm.tuple.Values;
 import backtype.storm.utils.Utils;
 
 @SuppressWarnings("serial")
-public class TwitterSampleSpout extends BaseRichSpout {
+public class TwitterSpout extends BaseRichSpout {
 
 	SpoutOutputCollector _collector;
 	LinkedBlockingQueue<Status> queue = null;
@@ -54,8 +54,8 @@ public class TwitterSampleSpout extends BaseRichSpout {
 	String[] keyWords;
 
 
-	public TwitterSampleSpout(String consumerKey, String consumerSecret,
-							  String accessToken, String accessTokenSecret, String[] keyWords) {
+	public TwitterSpout(String consumerKey, String consumerSecret,
+						String accessToken, String accessTokenSecret, String[] keyWords) {
 		this.consumerKey = consumerKey;
 		this.consumerSecret = consumerSecret;
 		this.accessToken = accessToken;
@@ -63,7 +63,7 @@ public class TwitterSampleSpout extends BaseRichSpout {
 		this.keyWords = keyWords;
 	}
 
-	public TwitterSampleSpout() {
+	public TwitterSpout() {
 		// TODO Auto-generated constructor stub
 	}
 

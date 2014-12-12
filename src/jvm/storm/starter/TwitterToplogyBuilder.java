@@ -13,37 +13,22 @@ import backtype.storm.tuple.Tuple;
 import storm.starter.bolt.IntermediateRankingsBolt;
 import storm.starter.bolt.RollingCountBolt;
 import storm.starter.bolt.TotalRankingsBolt;
-import storm.starter.spout.TwitterSampleSpout;
+import storm.starter.spout.TwitterSpout;
 
 // Created by gperinazzo on 28/11/2014
 
-public class TwitterTest {
-
-    public static class PrinterTweetBolt extends BaseBasicBolt {
-
-        @Override
-        public void execute(Tuple tuple, BasicOutputCollector collector) {
-            System.out.println(tuple.getString(0));
-        }
-
-        @Override
-        public void declareOutputFields(OutputFieldsDeclarer ofd) {
-
-        }
-    }
+public class TwitterToplogyBuilder {
 
     public static void main(String[] args) throws Exception {
 
         TopologyBuilder builder = new TopologyBuilder();
 
-        builder.setSpout("spout", new TwitterSampleSpout(), 1);
-        builder.setBolt("split", new SplitBolt(), 3).shuffleGrouping("spout");
+        //Spout
+        builder.setSpout("spout", new TwitterSpout(), 1);
+        //Pre-processing bolt
+        builder.setBolt("split", new SplitBolt(), 9).shuffleGrouping("spout");
 
-        // Hashtags
-        builder.setBolt("hashtag-counter", new RollingCountBolt(9, 3), 3).fieldsGrouping("split", "hashtags", new Fields("hashtag"));
-        builder.setBolt("hashtag-intermediate-ranking", new IntermediateRankingsBolt(10), 3).fieldsGrouping("hashtag-counter", new Fields("obj"));
-        builder.setBolt("hashtag-total-ranking", new TotalRankingsBolt(10)).globalGrouping("hashtag-intermediate-ranking");
-        builder.setBolt("hashtag-ranking-print", new RankingPrinterBolt("HASHTAG_RANKING.txt")).shuffleGrouping("hashtag-total-ranking");
+        /*20 seconds processing bolt chains*/
 
         // Most active user
         builder.setBolt("user-counter", new RollingCountBolt(9, 3), 3).fieldsGrouping("split", "usernames", new Fields("username"));
@@ -57,8 +42,30 @@ public class TwitterTest {
         builder.setBolt("mentions-total-ranking", new TotalRankingsBolt(10)).globalGrouping("mentions-intermediate-ranking");
         builder.setBolt("mentions-ranking-print", new RankingPrinterBolt("MENTIONS_RANKING.txt")).shuffleGrouping("mentions-total-ranking");
 
-        // Graph
+        // Community Graph
         builder.setBolt("graph-connections", new GraphBolt()).fieldsGrouping("split", "links", new Fields("mention"));
+
+        /*6 hour Hashtag Processing bolt chains*/
+
+        // Hashtags 5 minute sliding window
+        builder.setBolt("hashtag-counter", new RollingCountBolt(300, 60), 3).fieldsGrouping("split", "hashtags", new Fields("hashtag"));
+        builder.setBolt("hashtag-intermediate-ranking", new IntermediateRankingsBolt(10), 3).fieldsGrouping("hashtag-counter", new Fields("obj"));
+        builder.setBolt("hashtag-total-ranking", new TotalRankingsBolt(5)).globalGrouping("hashtag-intermediate-ranking");
+        builder.setBolt("hashtag-ranking-print", new CSVPrinterBolt("hashtags.csv", 5)).shuffleGrouping("hashtag-total-ranking");
+
+        // Hashtags 10 minute sliding window
+        builder.setBolt("hashtag-counter-10", new RollingCountBolt(600, 60), 3).fieldsGrouping("split", "hashtags", new Fields("hashtag"));
+        builder.setBolt("hashtag-intermediate-ranking-10", new IntermediateRankingsBolt(10), 3).fieldsGrouping("hashtag-counter-10", new Fields("obj"));
+        builder.setBolt("hashtag-total-ranking-10", new TotalRankingsBolt(5)).globalGrouping("hashtag-intermediate-ranking-10");
+        builder.setBolt("hashtag-ranking12-print-10", new CSVPrinterBolt("hashtags-10.csv", 10)).shuffleGrouping("hashtag-total-ranking-10");
+
+        // Hashtags 20 minute sliding window
+        builder.setBolt("hashtag-counter-20", new RollingCountBolt(1200, 60), 3).fieldsGrouping("split", "hashtags", new Fields("hashtag"));
+        builder.setBolt("hashtag-intermediate-ranking-20", new IntermediateRankingsBolt(10), 3).fieldsGrouping("hashtag-counter-20", new Fields("obj"));
+        builder.setBolt("hashtag-total-ranking-20", new TotalRankingsBolt(5)).globalGrouping("hashtag-intermediate-ranking-20");
+        builder.setBolt("hashtag-ranking-print-20", new CSVPrinterBolt("hashtags-20.csv", 20)).shuffleGrouping("hashtag-total-ranking-20");
+
+
 
         Config conf = new Config();
         conf.setDebug(true);
@@ -79,14 +86,13 @@ public class TwitterTest {
             builder.createTopology();
 
             try {
-                Thread.sleep(20000);
+                //kills topology after 6 hours
+                Thread.sleep(21600000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
             cluster.shutdown();
-
-            //cluster.killTopology("word-count");
         }
     }
 }

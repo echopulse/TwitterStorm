@@ -1,3 +1,6 @@
+#R script for graphing top 10 hashtags over time
+
+
 hashtags <- read.csv("~/Desktop/hashtags/hashtags-20.csv")
 
 hashtags$time <- as.POSIXlt(as.character(hashtags$Timestamp), format="%H:%M:%S")
@@ -17,8 +20,8 @@ top10Objects <- as.factor(top10Objects)
 #sets objects with counts not in top10 to -1
 hashtags$Count <- ifelse(
   hashtags$Object %in% top10Objects,
-  hashtags$Count, ## then it should be named as aDDs$answer
-  -1 ## else it should be named "Other"
+  hashtags$Count, ## then
+  -1 ## else
 )
 
 #deletes counts less than 0

@@ -2,16 +2,13 @@ package storm.starter;
 
 import backtype.storm.task.OutputCollector;
 import backtype.storm.task.TopologyContext;
-import backtype.storm.topology.BasicOutputCollector;
 import backtype.storm.topology.IRichBolt;
 import backtype.storm.topology.OutputFieldsDeclarer;
 import backtype.storm.tuple.Fields;
 import backtype.storm.tuple.Tuple;
 import backtype.storm.tuple.Values;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.Map;
 
 // Created by umarq on 04/12/2014
@@ -43,11 +40,13 @@ public class SplitBolt implements IRichBolt {
 
         for (String word : words) {
 
+            //separate and emit hashtags
             if (word.startsWith("#")) {
                 String hashtag = word.substring(1, word.length()).toUpperCase();
                 _collector.emit("hashtags", new Values(hashtag, timestamp));
             }
 
+            //separate and emit mentions
             if (word.startsWith("@")) {
                 String mention = word.substring(1, word.length());
                 _collector.emit("mentions", new Values(mention, timestamp));
@@ -55,7 +54,7 @@ public class SplitBolt implements IRichBolt {
             }
         }
 
-        _collector.emit("users", new Values(username, timestamp));
+        _collector.emit("usernames", new Values(username, timestamp));
     }
 
     @Override

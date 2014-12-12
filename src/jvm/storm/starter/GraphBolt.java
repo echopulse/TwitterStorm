@@ -35,6 +35,7 @@ public class GraphBolt implements IRichBolt {
         Node a;
         Node b;
 
+        //checks if nodes and edges already exist before adding them
         if(!username.equals(mention))
         {
             if(!nodeExist(username)) {
@@ -61,24 +62,7 @@ public class GraphBolt implements IRichBolt {
             }
         }
 
-        /*
-        if(!edgeExist(username, mention) && !edgeExist(mention, username)) {
-            graph.addEdge(username + " " + mention, username, mention);
-        }
-        */
     }
-
-    /*
-    public boolean edgeExist(String a, String b) {
-        for (Edge e : graph.getEachEdge()) {
-
-            if (e.getId().equals(a + " " + b)) {
-                return true;
-            }
-        }
-        return false;
-    }
-    */
 
     public boolean nodeExist(String s) {
         for (Node n : graph.getEachNode()) {
@@ -91,6 +75,7 @@ public class GraphBolt implements IRichBolt {
 
     @Override
     public void cleanup() {
+        //removes communities made up of only 2 nodes
         for (Node n : graph.getEachNode()) {
             Iterator<? extends Node> i = n.getBreadthFirstIterator();
             Node next = i.next();

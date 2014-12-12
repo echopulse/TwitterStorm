@@ -20,10 +20,11 @@ import java.util.Map;
 /**
  * Created by gperinazzo on 05/12/2014.
  */
+
+//Printer bolt which outputs to a text file
 public class RankingPrinterBolt extends BaseRichBolt {
 
     PrintWriter writer;
-    int count = 0;
     private OutputCollector _collector;
     private String filename;
     private DateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd HH:mm:ss");
@@ -48,7 +49,6 @@ public class RankingPrinterBolt extends BaseRichBolt {
     public void execute(Tuple tuple) {
 
         Date date = new Date();
-        Object temp = tuple.getValue(0);
         Rankings ranks = (Rankings) tuple.getValue(0);
 
         if(ranks.size() != 0) {
